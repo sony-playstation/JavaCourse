@@ -1,0 +1,63 @@
+1. Zadania
+
+Zadanie 1. Dodaj do klasy Zdarzenie metodę toString(). -- plik Zdarzenie.java
+Zadanie 2. Zabezpiecz klasę Proces przed dodaniem wartości null. -- plik Proces.java
+
+2. Zadania
+
+Zadanie 1. Napisz metodę obliczającą czas trwania procesu.-- plik AnalizaProcesu.java
+Zadanie 2. Zmodyfikuj analizę tak, aby obsługiwała procesy z jednym zdarzeniem. -- AnalizaSekwencji.java
+
+Zadanie 3. Wyjaśnij różnicę pomiędzy:
+• przechowywaniem danych,
+• ich analizą,
+• prezentacją wyników.
+
+Przechowywanie danych to odpowiedzialność klas takich jak Zdarzenie i Proces, które utrzymują dane w pamięci programu i dbają o ich integralność. Klasa Proces przechowuje listę obiektów Zdarzenie, a wszystkie pola są oznaczone jako private final, co zapewnia enkapsulację i niemutowalność.
+Analiza danych to zadanie odrębnych klas jak AnalizaProcesu czy AnalizaSekwencji. Te klasy przetwarzają dane, wykonują obliczenia i wyszukują wzorce. Przykładowo metoda obliczCzasTrwania() oblicza czas trwania procesu na podstawie znaczników czasowych zdarzeń.
+Prezentacja wyników polega na wyświetlaniu informacji użytkownikowi w czytelnej formie. Realizują to metody takie jak System.out.println() czy toString(), które formatują dane do postaci tekstowej.
+Rozdzielenie tych trzech odpowiedzialności jest zgodne z zasadą Single Responsibility Principle. Dzięki temu można łatwiej testować logikę bez interfejsu użytkownika, zmieniać sposób prezentacji bez modyfikacji logiki biznesowej oraz utrzymywać kod, ponieważ zmiany w jednym obszarze nie wpływają na pozostałe.
+
+3. Zadania
+Zadanie 1. Zdefiniuj interfejs Analizowalny z metodą analizuj(). -- plik Analizowalny.java
+Zadanie 2. Zaimplementuj ten interfejs w klasie Proces. -- plik Proces.java
+
+Zadanie 3. Wyjaśnij różnicę pomiędzy:
+• kontraktem wyrażonym przez interfejs,
+• walidacją w konstruktorze,
+• obsługą wyjątków.
+
+Kontrakt wyrażony przez interfejs określa, jakie metody klasa musi udostępniać. Interfejs Walidowalny wymaga implementacji metody waliduj(), ale nie określa sposobu jej realizacji. Jest to gwarancja na etapie kompilacji, która umożliwia polimorfizm, czyli jednolite traktowanie różnych obiektów implementujących ten sam interfejs.
+Walidacja w konstruktorze sprawdza poprawność danych wejściowych przed utworzeniem obiektu. Dzięki temu obiekt po utworzeniu jest zawsze w poprawnym stanie, co nazywamy niezmiennikiem klasowym. Przykładowo konstruktor klasy Zdarzenie sprawdza, czy identyfikatorProcesu nie jest pusty ani null. W rezultacie niepoprawne obiekty nie mogą w ogóle istnieć w systemie.
+Obsługa wyjątków to mechanizm sygnalizowania i reagowania na błędy w czasie wykonania programu. Gdy kontrakt zostanie naruszony, rzucany jest wyjątek, na przykład IllegalArgumentException dla błędnych danych wejściowych. Wyjątki zapewniają czytelne komunikaty o błędach i zapobiegają cichemu niepowodzeniu operacji.
+Te trzy mechanizmy współpracują ze sobą: interfejs definiuje co musi istnieć, walidacja w konstruktorze wymusza spełnienie warunków wstępnych, a wyjątki sygnalizują naruszenie kontraktu.
+
+
+4. Zadania
+Zadanie 1. Dodaj wyjątek PustyProcesException rzucany w przypadku walidacji procesu bez zdarzeń. -- plik PustyProcesException.java , ZdarzenieTest.java
+
+Zadanie 2. Zdecyduj, czy wyjątek ten powinien być checked czy unchecked i uzasadnij wybór.
+
+Wyjątek PustyProcesException powinien być unchecked, czyli dziedziczyć po RuntimeException poprzez klasę WyjatekProcesu.
+Głównym powodem jest to, że pusty proces sygnalizuje błąd programistyczny. Jeśli proces nie zawiera żadnych zdarzeń, oznacza to, że programista zapomniał dodać zdarzenia przed wywołaniem walidacji. Jest to błąd w kodzie, a nie problem zewnętrzny jak brak pliku czy awaria sieci.
+Dodatkowo taka sytuacja nie jest naprawialna w typowym przepływie programu. Gdy proces jest pusty, wywołujący kod nie ma sensownego sposobu na naprawienie tego problemu w miejscu wystąpienia błędu. Konieczna jest poprawka kodu tworzącego proces.
+Takie podejście jest zgodne z konwencjami Javy. Wyjątek IllegalStateException, który ma podobne zastosowanie, również jest unchecked. Błędy walidacji tradycyjnie należą do rodziny RuntimeException.
+Wyjątki checked byłyby odpowiednie w sytuacjach związanych z zasobami zewnętrznymi, takimi jak brak pliku czy błąd sieci, gdzie wywołujący może podjąć sensowne działania naprawcze i musi obsłużyć taką sytuację.
+
+Zadanie 3. Podaj przykład sytuacji w tym projekcie, w której użycie wyjątku byłoby błędem projektowym.
+
+Przykładem błędnego użycia wyjątku byłoby wyszukiwanie aktywności w procesie. Gdybyśmy napisali metodę znajdzAktywnosc(), która rzuca wyjątek AktywnoscNieZnalezionaException gdy aktywność nie istnieje, popełnilibyśmy błąd projektowy.
+Nieznalezienie aktywności jest normalną, oczekiwaną sytuacją w działaniu programu. Użytkownik może szukać aktywności, która nie występuje w danym procesie, i jest to całkowicie poprawny scenariusz użycia. Używanie wyjątków do sterowania logiką programu jest antywzorcem, ponieważ wyjątki są kosztowne (tworzenie śladu stosu) i ukrywają logikę w blokach catch.
+Poprawnym rozwiązaniem jest zwrócenie Optional<Zdarzenie> lub null, co pozwala wywołującemu kodowi sprawdzić wynik zwykłą instrukcją warunkową if. Zasada jest prosta: wyjątki służą do sytuacji wyjątkowych, czyli naruszeń kontraktu i błędów, a nie do normalnych wariantów wykonania programu.
+
+5. Zadania
+Zadanie 1. Napisz test weryfikujący, że metoda waliduj() w klasie Proces przechodzi poprawnie dla procesu z dwoma zdarzeniami. -- ProcesTest.java
+Zadanie 2. Napisz test negatywny sprawdzający, że dodanie null jako zdarzenia powoduje rzucenie wyjątku. -- ProcesTest.java
+
+Zadanie 3. Wyjaśnij, dlaczego testy jednostkowe nie zastępują walidacji w kodzie produkcyjnym.
+
+Testy jednostkowe i walidacja w kodzie produkcyjnym służą różnym celom. Testy weryfikują poprawność kodu podczas rozwoju aplikacji, natomiast walidacja chroni kod podczas działania w środowisku produkcyjnym.
+Testy nie są uruchamiane w produkcji. Działają przed wdrożeniem aplikacji, podczas gdy produkcja otrzymuje rzeczywiste, nieprzewidywalne dane od użytkowników i innych systemów. Użytkownicy mogą wprowadzić dane, których testy nie przewidziały.
+Testy nie są w stanie pokryć wszystkich możliwych przypadków. Istnieje nieskończona liczba możliwych danych wejściowych, nowe przypadki brzegowe są odkrywane z czasem, a integracja z systemami zewnętrznymi może wprowadzić nieprzewidziane błędy.
+Właściwym podejściem jest obrona w głąb, czyli stosowanie wielu warstw zabezpieczeń. Testy wyłapują błędy podczas rozwoju, a walidacja wyłapuje problemy w czasie działania programu. Można powiedzieć, że testy dokumentują oczekiwane zachowanie systemu, natomiast walidacja wymusza poprawne zachowanie. Sama dokumentacja nie zapobiega niewłaściwemu użyciu, dlatego oba mechanizmy są niezbędne i wzajemnie się uzupełniają.
+
